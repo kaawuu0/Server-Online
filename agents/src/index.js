@@ -11,6 +11,19 @@ const { DashboardServer } = require('./server/dashboardServer');
 const configPath = path.join(__dirname, '../config.json');
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
+// Allow environment variables to dynamically override config (for Render, Cloud, Docker)
+if (process.env.MC_HOST) config.server.host = process.env.MC_HOST;
+if (process.env.MC_PORT) config.server.port = parseInt(process.env.MC_PORT, 10);
+if (process.env.PORT) config.dashboard.port = parseInt(process.env.PORT, 10);
+if (process.env.GROQ_API_KEY) {
+  config.llm.provider = 'groq';
+  config.llm.groqApiKey = process.env.GROQ_API_KEY;
+}
+if (process.env.GEMINI_API_KEY) {
+  config.llm.provider = 'gemini';
+  config.llm.geminiApiKey = process.env.GEMINI_API_KEY;
+}
+
 // Storage directory
 const storageDir = path.resolve(__dirname, '../../memory_storage');
 if (!fs.existsSync(storageDir)) {

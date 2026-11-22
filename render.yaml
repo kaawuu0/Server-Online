@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: minecraft-ai-colony
+    env: node
+    plan: free
+    buildCommand: cd agents && npm install
+    startCommand: cd agents && node src/index.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20.12.0
+      - key: MC_HOST
+        sync: false # Set this to your free Minecraft server address (e.g. your-server.falixnodes.net)
+      - key: MC_PORT
+        value: 25565
+      - key: GROQ_API_KEY
+        sync: false # Optional free key from console.groq.com
