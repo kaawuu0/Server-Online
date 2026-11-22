@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+agents/node_modules/
+
+# Server runtime logs & caches
+server/logs/
+server/cache/
+server/.console_history
+server/libraries/
+server/.paper-remapped/
+
+# Environment secrets
+.env
+*.env.local
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store

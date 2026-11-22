@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  minecraft-ai-colony:
+    build: .
+    container_name: mc-ai-colony-247
+    restart: always
+    ports:
+      - "7860:7860"   # Mission Control Web Dashboard
+      - "25565:25565" # Minecraft Server Game Port
+      - "3001:3001"   # Aria 3D Live Perspective
+      - "3002:3002"   # Boran 3D Live Perspective
+      - "3003:3003"   # Clover 3D Live Perspective
+    volumes:
+      - ./server/world:/app/server/world
+      - ./memory_storage:/app/memory_storage
+    environment:
+      - PLAYIT_SECRET_KEY=

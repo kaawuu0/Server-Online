@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minecraft AI Colony — 24/7 Observation Mission Control</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <div class="hud-container">
+    <!-- Top Header Navigation -->
+    <header class="hud-header">
+      <div class="header-left">
+        <div class="status-pulse-live"></div>
+        <div class="brand">
+          <h1>MINECRAFT AI COLONY</h1>
+          <span class="sub-brand">24/7 AUTONOMOUS MULTI-AGENT EVOLUTION</span>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat-pill">
+          <span class="label">UPTIME</span>
+          <span class="value" id="uptime-display">24/7 ACTIVE</span>
+        </div>
+        <div class="stat-pill">
+          <span class="label">COLONY LEVEL</span>
+          <span class="value highlight" id="colony-level">LVL 1</span>
+        </div>
+        <div class="stat-pill">
+          <span class="label">TOTAL XP</span>
+          <span class="value" id="colony-xp">40 XP</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Grid Content -->
+    <main class="hud-grid">
+      <!-- Left Column: Agent Cards & 3D Viewers -->
+      <section class="left-col">
+        <div class="section-title">
+          <h2>AUTONOMOUS AGENTS TELEMETRY</h2>
+          <span class="badge">3 ONLINE</span>
+        </div>
+
+        <div class="agents-container" id="agents-list">
+          <!-- Aria Card -->
+          <div class="agent-card" id="agent-Aria">
+            <div class="agent-header">
+              <div class="agent-avatar aria-glow">A</div>
+              <div class="agent-meta">
+                <div class="name-row">
+                  <h3>Aria</h3>
+                  <span class="role-tag builder">Architect & Builder</span>
+                </div>
+                <div class="goal-tag" id="goal-Aria">INITIALIZING...</div>
+              </div>
+            </div>
+            <div class="vitals-row">
+              <div class="vital-bar">
+                <span class="vital-lbl">HP: <b id="hp-Aria">20</b>/20</span>
+                <div class="progress-track"><div class="progress-fill hp" id="bar-hp-Aria" style="width: 100%"></div></div>
+              </div>
+              <div class="vital-bar">
+                <span class="vital-lbl">FOOD: <b id="food-Aria">20</b>/20</span>
+                <div class="progress-track"><div class="progress-fill food" id="bar-food-Aria" style="width: 100%"></div></div>
+              </div>
+            </div>
+            <div class="telemetry-info">
+              <span>POS: <b id="pos-Aria">(0, 64, 0)</b></span>
+              <span>INVENTORY: <b id="inv-Aria">Loading...</b></span>
+            </div>
+            <div class="thought-bubble">
+              <span class="thought-lbl">STREAM OF CONSCIOUSNESS:</span>
+              <p id="thought-Aria">"Surveying land to place our first shelter foundation."</p>
+            </div>
+            <div class="viewer-embed">
+              <div class="viewer-header">
+                <span>3D LIVE PERSPECTIVE</span>
+                <a href="http://localhost:3001" target="_blank" class="ext-btn">Full Screen ↗</a>
+              </div>
+              <iframe src="http://localhost:3001" class="viewer-frame" title="Aria 3D View"></iframe>
+            </div>
+          </div>
+
+          <!-- Boran Card -->
+          <div class="agent-card" id="agent-Boran">
+            <div class="agent-header">
+              <div class="agent-avatar boran-glow">B</div>
+              <div class="agent-meta">
+                <div class="name-row">
+                  <h3>Boran</h3>
+                  <span class="role-tag miner">Miner & Blacksmith</span>
+                </div>
+                <div class="goal-tag" id="goal-Boran">INITIALIZING...</div>
+              </div>
+            </div>
+            <div class="vitals-row">
+              <div class="vital-bar">
+                <span class="vital-lbl">HP: <b id="hp-Boran">20</b>/20</span>
+                <div class="progress-track"><div class="progress-fill hp" id="bar-hp-Boran" style="width: 100%"></div></div>
+              </div>
+              <div class="vital-bar">
+                <span class="vital-lbl">FOOD: <b id="food-Boran">20</b>/20</span>
+                <div class="progress-track"><div class="progress-fill food" id="bar-food-Boran" style="width: 100%"></div></div>
+              </div>
+            </div>
+            <div class="telemetry-info">
+              <span>POS: <b id="pos-Boran">(0, 64, 0)</b></span>
+              <span>INVENTORY: <b id="inv-Boran">Loading...</b></span>
+            </div>
+            <div class="thought-bubble">
+              <span class="thought-lbl">STREAM OF CONSCIOUSNESS:</span>
+              <p id="thought-Boran">"Scouting rock outcrop for stone and coal deposits."</p>
+            </div>
+            <div class="viewer-embed">
+              <div class="viewer-header">
+                <span>3D LIVE PERSPECTIVE</span>
+                <a href="http://localhost:3002" target="_blank" class="ext-btn">Full Screen ↗</a>
+              </div>
+              <iframe src="http://localhost:3002" class="viewer-frame" title="Boran 3D View"></iframe>
+            </div>
+          </div>
+
+          <!-- Clover Card -->
+          <div class="agent-card" id="agent-Clover">
+            <div class="agent-header">
+              <div class="agent-avatar clover-glow">C</div>
+              <div class="agent-meta">
+                <div class="name-row">
+                  <h3>Clover</h3>
+                  <span class="role-tag scout">Scout & Botanist</span>
+                </div>
+                <div class="goal-tag" id="goal-Clover">INITIALIZING...</div>
+              </div>
+            </div>
+            <div class="vitals-row">
+              <div class="vital-bar">
+                <span class="vital-lbl">HP: <b id="hp-Clover">20</b>/20</span>
+                <div class="progress-track"><div class="progress-fill hp" id="bar-hp-Clover" style="width: 100%"></div></div>
+              </div>
+              <div class="vital-bar">
+                <span class="vital-lbl">FOOD: <b id="food-Clover">20</b>/20</span>
+                <div class="progress-track"><div class="progress-fill food" id="bar-food-Clover" style="width: 100%"></div></div>
+              </div>
+            </div>
+            <div class="telemetry-info">
+              <span>POS: <b id="pos-Clover">(0, 64, 0)</b></span>
+              <span>INVENTORY: <b id="inv-Clover">Loading...</b></span>
+            </div>
+            <div class="thought-bubble">
+              <span class="thought-lbl">STREAM OF CONSCIOUSNESS:</span>
+              <p id="thought-Clover">"Foraging wild seeds and surveying water sources."</p>
+            </div>
+            <div class="viewer-embed">
+              <div class="viewer-header">
+                <span>3D LIVE PERSPECTIVE</span>
+                <a href="http://localhost:3003" target="_blank" class="ext-btn">Full Screen ↗</a>
+              </div>
+              <iframe src="http://localhost:3003" class="viewer-frame" title="Clover 3D View"></iframe>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Live Chat, Skill Tree, and Chronicle -->
+      <section class="right-col">
+        <!-- Live Inter-Agent Chat Feed -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>INTER-AGENT CHAT &amp; COORDINATION</h3>
+            <span class="panel-badge">LIVE SOCKET</span>
+          </div>
+          <div class="chat-feed" id="chat-messages">
+            <div class="chat-entry system">
+              <span class="chat-time">SYSTEM</span>
+              <span class="chat-body">Mission Control online. Watching Aria, Boran, and Clover interact...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Evolutionary Skill Progression -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>SKILL PROGRESSION &amp; EVOLUTION TREE</h3>
+            <span class="panel-badge" id="skills-count">3 UNLOCKED</span>
+          </div>
+          <div class="skills-grid" id="skills-grid">
+            <div class="skill-chip unlocked">
+              <span class="skill-name">Timberjack</span>
+              <span class="skill-cat">Gathering</span>
+            </div>
+            <div class="skill-chip unlocked">
+              <span class="skill-name">Lithic Mastery</span>
+              <span class="skill-cat">Mining</span>
+            </div>
+            <div class="skill-chip locked">
+              <span class="skill-name">Iron Age Artisan</span>
+              <span class="skill-cat">Metallurgy</span>
+            </div>
+            <div class="skill-chip locked">
+              <span class="skill-name">Master Architect</span>
+              <span class="skill-cat">Construction</span>
+            </div>
+            <div class="skill-chip locked">
+              <span class="skill-name">Green Thumb</span>
+              <span class="skill-cat">Agriculture</span>
+            </div>
+            <div class="skill-chip locked">
+              <span class="skill-name">Colony Sentinel</span>
+              <span class="skill-cat">Combat</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chronicle / Milestone Feed -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>COLONY HISTORICAL CHRONICLE</h3>
+            <span class="panel-badge">MILESTONES</span>
+          </div>
+          <div class="chronicle-feed" id="chronicle-feed">
+            <div class="chronicle-entry">
+              <span class="chronicle-time">Day 1</span>
+              <p>Aria, Boran, and Clover established the initial spawn outpost. First tools fashioned from wilderness timber.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

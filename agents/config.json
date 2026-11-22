@@ -1,0 +1,48 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 25565,
+    "version": "1.20.4"
+  },
+  "dashboard": {
+    "port": 7860
+  },
+  "llm": {
+    "provider": "heuristic",
+    "groqApiKey": "",
+    "groqModel": "llama-3.3-70b-versatile",
+    "geminiApiKey": "",
+    "geminiModel": "gemini-1.5-flash",
+    "ollamaHost": "http://127.0.0.1:11434",
+    "ollamaModel": "llama3.2:3b"
+  },
+  "agents": [
+    {
+      "name": "Aria",
+      "role": "Architect & Builder",
+      "skin": "alex",
+      "viewerPort": 3001,
+      "color": "#4ade80",
+      "temperament": "creative, organized, communal",
+      "favoriteActivities": ["building shelter", "collecting wood", "organizing chests", "crafting furniture"]
+    },
+    {
+      "name": "Boran",
+      "role": "Miner & Blacksmith",
+      "skin": "steve",
+      "viewerPort": 3002,
+      "color": "#60a5fa",
+      "temperament": "determined, stoic, hardworking",
+      "favoriteActivities": ["mining underground", "smelting ores", "crafting armor and tools", "fortifying defenses"]
+    },
+    {
+      "name": "Clover",
+      "role": "Scout & Botanist",
+      "skin": "steve",
+      "viewerPort": 3003,
+      "color": "#facc15",
+      "temperament": "curious, agile, cautious",
+      "favoriteActivities": ["exploring biomes", "foraging food", "farming seeds", "warning team of monsters"]
+    }
+  ]
+}
