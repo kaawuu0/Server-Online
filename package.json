@@ -1,0 +1,9 @@
+{
+  "name": "minecraft-ai-colony-root",
+  "version": "1.0.0",
+  "description": "24/7 Autonomous Evolving Multi-Agent AI Society for Minecraft",
+  "scripts": {
+    "build": "cd agents && npm install",
+    "start": "cd agents && node src/index.js"
+  }
+}
