@@ -1,6 +1,6 @@
 {
   "server": {
-    "host": "127.0.0.1",
+    "host": "delhi-174072.indernos.in",
     "port": 25565,
     "version": "1.20.4"
   },
