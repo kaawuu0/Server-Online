@@ -32,6 +32,8 @@ socket.on('chat_message', (chat) => {
 // Skill unlocked update
 socket.on('skill_unlocked', (event) => {
   addChronicleEntry(`Skill Unlocked: ${event.title}`, `${event.agent} unlocked ${event.title} (${event.category}) - ${event.description}`);
+  // Dynamically refresh skills HUD
+  fetch('/api/skills').then(r => r.json()).then(data => updateSkillsUI(data)).catch(() => {});
 });
 
 function updateAgentCard(agent) {

@@ -104,7 +104,7 @@ Respond in valid JSON format:
   "thought": "Your internal reflection on the current situation",
   "goal": "Immediate tactical goal (e.g., GATHER_WOOD, CRAFT_TOOLS, MINE_STONE, BUILD_WALLS, EAT, SLEEP, DEFEND)",
   "dialogue": "Short sentence spoken in Minecraft chat to teammates (or empty string)",
-  "action": { "type": "gather|craft|build|explore|rest", "target": "item or block name" }
+  "action": { "type": "gather_wood|gather_food|mine_stone|mine_ore|craft|build|place_torch|farm|eat|sleep|fight|retreat|explore", "target": "item or block name" }
 }`;
   }
 

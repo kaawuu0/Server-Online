@@ -13,6 +13,9 @@ server/.paper-remapped/
 .env
 *.env.local
 
+# Local colony runtime state
+memory_storage/
+
 # OS files
 Thumbs.db
 Desktop.ini

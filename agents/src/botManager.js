@@ -49,12 +49,16 @@ class BotManager {
     bot.once('spawn', () => {
       console.log(`[BotManager] ${name} has spawned in the world!`);
 
-      // Initialize pathfinder movements
+      // Initialize fast, responsive pathfinder movements
       const defaultMove = new Movements(bot);
       defaultMove.canDig = true;
       defaultMove.allowSprinting = true;
       defaultMove.allow1by1towers = false;
+      defaultMove.allowParkour = true;
+      defaultMove.maxDropDown = 4;
+      defaultMove.dontCreateFlow = true;
       bot.pathfinder.setMovements(defaultMove);
+      bot.pathfinder.thinkTimeout = 3000; // Fast path calculation without lag
 
       // Start WebGL 3D Viewer for this bot (allows real-time web observation!)
       if (prismarineViewer) {
@@ -69,14 +73,14 @@ class BotManager {
       // Record spawn in memory
       this.memory.addEvent(name, `Awakened at coordinates (${Math.round(bot.entity.position.x)}, ${Math.round(bot.entity.position.y)}, ${Math.round(bot.entity.position.z)})`, 'discovery');
 
-      // Start cognitive loop
+      // Start cognitive loop with full event routing
       const cognitiveLoop = new CognitiveLoop(
         bot,
         agentConfig,
         this.memory,
         this.skills,
         this.llm,
-        (data) => this.emitDashboard('agent_update', data)
+        (type, data) => this.emitDashboard(type, data)
       );
 
       this.cognitiveLoops.set(name, cognitiveLoop);
