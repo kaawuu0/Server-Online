@@ -3,7 +3,22 @@
   "version": "1.0.0",
   "description": "24/7 Autonomous Evolving Multi-Agent AI Society for Minecraft",
   "scripts": {
+    "postinstall": "cd agents && npm install",
     "build": "cd agents && npm install",
     "start": "cd agents && node src/index.js"
+  },
+  "workspaces": [
+    "agents"
+  ],
+  "dependencies": {
+    "canvas": "^3.2.3",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "mineflayer": "^4.20.1",
+    "mineflayer-collectblock": "^1.4.1",
+    "mineflayer-pathfinder": "^2.4.5",
+    "prismarine-viewer": "^1.29.0",
+    "socket.io": "^4.7.5",
+    "vec3": "^0.1.10"
   }
 }
