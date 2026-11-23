@@ -2,7 +2,12 @@
 const mineflayer = require('mineflayer');
 const { pathfinder, Movements } = require('mineflayer-pathfinder');
 const { plugin: collectBlock } = require('mineflayer-collectblock');
-const { mineflayer: prismarineViewer } = require('prismarine-viewer');
+let prismarineViewer = null;
+try {
+  prismarineViewer = require('prismarine-viewer').mineflayer;
+} catch (e) {
+  console.warn('[Prismarine-Viewer] Optional 3D viewer library not loaded:', e.message);
+}
 const { CognitiveLoop } = require('./brain/cognitiveLoop');
 
 class BotManager {
@@ -19,10 +24,10 @@ class BotManager {
   startAll() {
     console.log(`[BotManager] Initializing ${this.config.agents.length} autonomous agents...`);
     this.config.agents.forEach((agentConfig, idx) => {
-      // Stagger connections slightly so the server accepts them smoothly
+      // Stagger connections slightly so the server accepts them smoothly without throttling
       setTimeout(() => {
         this.spawnBot(agentConfig);
-      }, idx * 4000);
+      }, idx * 8000);
     });
   }
 
@@ -52,11 +57,13 @@ class BotManager {
       bot.pathfinder.setMovements(defaultMove);
 
       // Start WebGL 3D Viewer for this bot (allows real-time web observation!)
-      try {
-        prismarineViewer(bot, { port: viewerPort, firstPerson: true });
-        console.log(`[Prismarine-Viewer] ${name}'s 3D live camera listening on port ${viewerPort}`);
-      } catch (e) {
-        console.warn(`[Prismarine-Viewer] Failed to bind viewer on port ${viewerPort}:`, e.message);
+      if (prismarineViewer) {
+        try {
+          prismarineViewer(bot, { port: viewerPort, firstPerson: true });
+          console.log(`[Prismarine-Viewer] ${name}'s 3D live camera listening on port ${viewerPort}`);
+        } catch (e) {
+          console.warn(`[Prismarine-Viewer] Failed to bind viewer on port ${viewerPort}:`, e.message);
+        }
       }
 
       // Record spawn in memory
