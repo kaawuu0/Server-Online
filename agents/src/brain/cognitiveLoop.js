@@ -33,17 +33,35 @@ class CognitiveLoop {
   }
 
   start() {
-    // Main cognitive cycle every 4 seconds (was 7s — now much faster)
-    this.timer = setInterval(() => this.cycle(), 4000);
-    setTimeout(() => this.cycle(), 2000);
-
-    // Register reactive event handlers (respond instantly to threats)
+    this.running = true;
     this.registerReactiveHandlers();
+    this.runLoop();
   }
 
   stop() {
-    if (this.timer) clearInterval(this.timer);
+    this.running = false;
     this.removeReactiveHandlers();
+  }
+
+  async runLoop() {
+    // Initial brief settle to load spawn chunks
+    await new Promise(r => setTimeout(r, 1500));
+
+    while (this.running) {
+      if (!this.bot || !this.bot.entity) {
+        await new Promise(r => setTimeout(r, 1000));
+        continue;
+      }
+
+      try {
+        await this.cycle();
+      } catch (err) {
+        console.error(`[${this.persona.name}] Cycle error:`, err.message);
+      }
+
+      // Continuous human-like cadence: 600ms breath between actions (eliminates 10-second lag!)
+      await new Promise(r => setTimeout(r, 600));
+    }
   }
 
   registerReactiveHandlers() {
@@ -98,8 +116,6 @@ class CognitiveLoop {
 
   async cycle() {
     if (!this.bot || !this.bot.entity) return;
-    if (this.isBusy) return;
-
     this.isBusy = true;
     this.tickCount++;
 

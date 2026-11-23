@@ -1,95 +1,80 @@
-// Smart Mining with Tool Selection and Ore Priority
+// Fast Quarrying and Mining (Optimized for Zero-Lag, Real-Time Cadence)
 const { goals } = require('mineflayer-pathfinder');
 
-const ORE_PRIORITY = ['diamond_ore', 'deepslate_diamond_ore', 'emerald_ore', 'gold_ore', 'deepslate_gold_ore', 'iron_ore', 'deepslate_iron_ore', 'copper_ore', 'coal_ore', 'deepslate_coal_ore', 'lapis_ore', 'redstone_ore'];
-const STONE_TYPES = ['stone', 'cobblestone', 'deepslate', 'andesite', 'diorite', 'granite'];
+const ORE_NAMES = ['diamond_ore', 'deepslate_diamond_ore', 'iron_ore', 'deepslate_iron_ore', 'coal_ore', 'deepslate_coal_ore', 'copper_ore', 'gold_ore'];
+const STONE_NAMES = ['stone', 'cobblestone', 'deepslate', 'andesite', 'diorite', 'granite'];
 
 async function mineOre(bot, memory, agentName) {
-  const mcData = require('minecraft-data')(bot.version);
-
-  // Equip best pickaxe first
+  const mcData = bot.registry || require('minecraft-data')(bot.version);
   equipBestPickaxe(bot);
 
-  // Try ores in priority order
-  for (const oreName of ORE_PRIORITY) {
-    const block = mcData.blocksByName[oreName];
-    if (!block) continue;
+  // Single-pass scan for any priority ore within 12 blocks
+  const oreIds = ORE_NAMES.map(n => mcData.blocksByName[n]?.id).filter(Boolean);
+  const ore = bot.findBlock({ matching: oreIds, maxDistance: 12, count: 1 });
 
-    const ore = bot.findBlock({ matching: block.id, maxDistance: 20 });
-    if (ore) {
-      memory.recordResourceLocation(agentName, oreName, ore.position);
-      try {
-        // Navigate close
-        await bot.pathfinder.goto(new goals.GoalNear(ore.position.x, ore.position.y, ore.position.z, 2));
-        await bot.dig(ore);
-        return { success: true, ore: oreName, pos: ore.position };
-      } catch (e) {
-        return { success: false, reason: e.message };
-      }
+  if (!ore) return { success: false, reason: 'no_ore_nearby' };
+
+  memory.recordResourceLocation(agentName, ore.name, ore.position);
+
+  try {
+    const dist = bot.entity.position.distanceTo(ore.position);
+    if (dist > 4.2) {
+      await Promise.race([
+        bot.pathfinder.goto(new goals.GoalNear(ore.position.x, ore.position.y, ore.position.z, 2)),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2500))
+      ]);
     }
-  }
 
-  return { success: false, reason: 'no_ore_nearby' };
+    await bot.lookAt(ore.position.offset(0.5, 0.5, 0.5));
+    if (bot.canDigBlock(ore)) {
+      await bot.dig(ore);
+      return { success: true, ore: ore.name, pos: ore.position };
+    }
+  } catch (e) {
+    if (bot.entity.position.distanceTo(ore.position) <= 4.5 && bot.canDigBlock(ore)) {
+      try {
+        await bot.dig(ore);
+        return { success: true, ore: ore.name, pos: ore.position };
+      } catch (err) {}
+    }
+    return { success: false, reason: e.message };
+  }
+  return { success: false, reason: 'unreachable' };
 }
 
 async function mineStone(bot, memory, agentName) {
-  const mcData = require('minecraft-data')(bot.version);
+  const mcData = bot.registry || require('minecraft-data')(bot.version);
   equipBestPickaxe(bot);
 
-  const stoneIds = STONE_TYPES.map(n => mcData.blocksByName[n]?.id).filter(Boolean);
-  const stone = bot.findBlock({ matching: stoneIds, maxDistance: 16 });
+  const stoneIds = STONE_NAMES.map(n => mcData.blocksByName[n]?.id).filter(Boolean);
+  const stone = bot.findBlock({ matching: stoneIds, maxDistance: 10, count: 1 });
 
-  if (stone) {
-    try {
-      if (bot.collectBlock) {
-        await bot.collectBlock.collect(stone, { timeout: 6000 });
-      } else {
-        await bot.pathfinder.goto(new goals.GoalNear(stone.position.x, stone.position.y, stone.position.z, 2));
-        await bot.dig(stone);
-      }
-      return { success: true, block: stone.name, pos: stone.position };
-    } catch (e) {
-      return { success: false, reason: e.message };
-    }
-  }
-  return { success: false, reason: 'no_stone_nearby' };
-}
-
-async function stripMine(bot, memory, agentName) {
-  // Dig down to y=11 (best diamond level for 1.20.4 is actually y=-59, but above y=0 is safer for bots)
-  const pos = bot.entity.position;
-  const mcData = require('minecraft-data')(bot.version);
-  equipBestPickaxe(bot);
-
-  // If we're on the surface, try to mine 3 blocks forward at current level
-  const forward = bot.entity.position.offset(
-    Math.round(-Math.sin(bot.entity.yaw)) * 3,
-    0,
-    Math.round(-Math.cos(bot.entity.yaw)) * 3
-  );
+  if (!stone) return { success: false, reason: 'no_stone_nearby' };
 
   try {
-    // Mine a 1x2 tunnel forward
-    for (let i = 1; i <= 3; i++) {
-      const target = bot.entity.position.offset(
-        Math.round(-Math.sin(bot.entity.yaw)) * i,
-        0,
-        Math.round(-Math.cos(bot.entity.yaw)) * i
-      );
-      const block = bot.blockAt(target);
-      if (block && block.name !== 'air' && block.name !== 'water' && block.name !== 'lava') {
-        await bot.dig(block);
-      }
-      // Mine block above too for head clearance
-      const blockAbove = bot.blockAt(target.offset(0, 1, 0));
-      if (blockAbove && blockAbove.name !== 'air') {
-        await bot.dig(blockAbove);
-      }
+    const dist = bot.entity.position.distanceTo(stone.position);
+    if (dist > 4.2) {
+      await Promise.race([
+        bot.pathfinder.goto(new goals.GoalNear(stone.position.x, stone.position.y, stone.position.z, 2)),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 2000))
+      ]);
     }
-    return { success: true, action: 'strip_mine' };
+
+    await bot.lookAt(stone.position.offset(0.5, 0.5, 0.5));
+    if (bot.canDigBlock(stone)) {
+      await bot.dig(stone);
+      return { success: true, block: stone.name, pos: stone.position };
+    }
   } catch (e) {
+    if (bot.entity.position.distanceTo(stone.position) <= 4.5 && bot.canDigBlock(stone)) {
+      try {
+        await bot.dig(stone);
+        return { success: true, block: stone.name, pos: stone.position };
+      } catch (err) {}
+    }
     return { success: false, reason: e.message };
   }
+  return { success: false, reason: 'unreachable' };
 }
 
 function equipBestPickaxe(bot) {
@@ -104,4 +89,4 @@ function equipBestPickaxe(bot) {
   return false;
 }
 
-module.exports = { mineOre, mineStone, stripMine, equipBestPickaxe };
+module.exports = { mineOre, mineStone, equipBestPickaxe };
